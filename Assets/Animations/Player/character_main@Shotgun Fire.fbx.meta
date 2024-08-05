@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a2411574a0f22934b9a6c75281a34b38
+guid: a88bbb2efb138004f90675becf645641
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Rifle Aiming Idle
+      name: Shotgun Fire
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 88
+      firstFrame: 4
+      lastFrame: 31
       wrapMode: 0
       orientationOffsetY: 0.5
       level: 0
@@ -106,19 +106,7 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
-  referencedClips:
-  - 824a32f2677095c4b8bfcf68650407e2
-  - 355f8cb7a91dc7a4f95f8679f0633056
-  - b9e9d90f92ad45147b81ff121e80fe1b
-  - 3248ce0efc0fac449a2df05788186675
-  - aa275159d0796b140b6f4921166a308f
-  - 63e02ced325e9aa45b6f08a3f667c740
-  - 78ecdb06d5506c246b0eee6b92268c87
-  - 4fff736d2aeaa944995bb71d58f2f216
-  - aafdbad2b85e796458742a3b29f19528
-  - 297125f5c50b17a4e8ad135323083774
-  - a88bbb2efb138004f90675becf645641
-  - 767ecde570177e446b084db019073d2a
+  referencedClips: []
   importAnimation: 1
   humanDescription:
     serializedVersion: 3
@@ -545,11 +533,11 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: a2411574a0f22934b9a6c75281a34b38, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3
   humanoidOversampling: 1
-  avatarSetup: 1
+  avatarSetup: 2
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0

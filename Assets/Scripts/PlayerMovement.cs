@@ -1,9 +1,9 @@
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
+    [SerializeField] private Player _player;
     private PlayerControls _controls;
     private CharacterController _characterController;
 
@@ -23,20 +23,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask _aimLayerMask;
     private Vector3 _lookingDirection;
 
-
     private Vector2 _moveInput;
     private Vector2 _aimInput;
-
-    private void Awake()
-    {
-        AssignInputEvents();
-    }
 
     private void Start()
     {
         _characterController = GetComponent<CharacterController>();
 
         _speed = _walkSpeed;
+
+        AssignInputEvents();
     }
 
     private void Update()
@@ -44,11 +40,6 @@ public class PlayerMovement : MonoBehaviour
         ApplyMovement();
         AimTowardsMouse();
         AnimatorControllers();
-    }
-
-    private void Shoot()
-    {
-        _animator.SetTrigger("Fire");
     }
 
     private void AnimatorControllers()
@@ -75,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
 
             transform.forward = _lookingDirection;
 
-            _aim.position = new Vector3(hitInfo.point.x, transform.position.y, hitInfo.point.z);
+            _aim.position = new Vector3(hitInfo.point.x, transform.position.y + 1, hitInfo.point.z);
         }
     }
 
@@ -105,9 +96,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void AssignInputEvents()
     {
-        _controls = new PlayerControls();
-
-        _controls.Character.Fire.performed += context => Shoot();
+        _controls = _player.Controls;
 
         _controls.Character.Movement.performed += context => _moveInput = context.ReadValue<Vector2>();
         _controls.Character.Movement.canceled += context => _moveInput = Vector2.zero;
@@ -126,15 +115,5 @@ public class PlayerMovement : MonoBehaviour
             _speed = _walkSpeed;
             _isRunning = false;
         };
-    }
-
-    private void OnEnable()
-    {
-        _controls.Enable();
-    }
-
-    private void OnDisable()
-    {
-        _controls.Disable();
     }
 }
