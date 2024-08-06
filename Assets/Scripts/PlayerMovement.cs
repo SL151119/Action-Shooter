@@ -4,27 +4,24 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private Player _player;
+    [SerializeField] private Animator _animator;
+
     private PlayerControls _controls;
     private CharacterController _characterController;
-
-    [SerializeField] private Animator _animator;
 
     [Header("Movement Info")]
     [SerializeField] private float _gravityScale = 9.81f;
     [SerializeField] private float _walkSpeed = 1.5f;
     [SerializeField] private float _runSpeed = 3f;
+    [Range(10f, 100f)]
+    [SerializeField] private float _turnSpeed = 10f;
     private float _speed;
-    private Vector3 _movementDirection;
     private float _verticalVelocity;
+
+    private Vector3 _movementDirection;
+    public Vector2 MoveInput { get; private set; }
+
     private bool _isRunning;
-
-    [Header("Aim Info")]
-    [SerializeField] private Transform _aim;
-    [SerializeField] private LayerMask _aimLayerMask;
-    private Vector3 _lookingDirection;
-
-    private Vector2 _moveInput;
-    private Vector2 _aimInput;
 
     private void Start()
     {
@@ -38,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         ApplyMovement();
-        AimTowardsMouse();
+        ApplyRotation();
         AnimatorControllers();
     }
 
@@ -54,25 +51,19 @@ public class PlayerMovement : MonoBehaviour
         _animator.SetBool("isRunning", playRunAnimation);
     }
 
-    private void AimTowardsMouse()
+    private void ApplyRotation()
     {
-        Ray ray = Camera.main.ScreenPointToRay(_aimInput);
+        Vector3 lookingDirection = _player.Aim.GetMouseHitInfo().point - transform.position;
+        lookingDirection.y = 0f;
+        lookingDirection.Normalize();
 
-        if (Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, _aimLayerMask))
-        {
-            _lookingDirection = hitInfo.point - transform.position;
-            _lookingDirection.y = 0f;
-            _lookingDirection.Normalize();
-
-            transform.forward = _lookingDirection;
-
-            _aim.position = new Vector3(hitInfo.point.x, transform.position.y + 1, hitInfo.point.z);
-        }
+        Quaternion targetRotation = Quaternion.LookRotation(lookingDirection);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
     }
 
     private void ApplyMovement()
     {
-        _movementDirection = new Vector3(_moveInput.x, 0, _moveInput.y);
+        _movementDirection = new Vector3(MoveInput.x, 0, MoveInput.y);
         ApplyGravity();
 
         if (_movementDirection.magnitude > 0)
@@ -98,11 +89,8 @@ public class PlayerMovement : MonoBehaviour
     {
         _controls = _player.Controls;
 
-        _controls.Character.Movement.performed += context => _moveInput = context.ReadValue<Vector2>();
-        _controls.Character.Movement.canceled += context => _moveInput = Vector2.zero;
-
-        _controls.Character.Aim.performed += context => _aimInput = context.ReadValue<Vector2>();
-        _controls.Character.Aim.canceled += context => _aimInput = Vector2.zero;
+        _controls.Character.Movement.performed += context => MoveInput = context.ReadValue<Vector2>();
+        _controls.Character.Movement.canceled += context => MoveInput = Vector2.zero;
 
         _controls.Character.Run.performed += context =>
         {
