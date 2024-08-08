@@ -20,12 +20,15 @@ public class PlayerWeaponVisuals : MonoBehaviour
     [SerializeField] private float _rigWeightIncreaseRate = 2.75f;
     private bool _shouldIncrease_RigWeight;
 
-    private bool _isEquipingWeapon;
-
     private void Update()
     {
         UpdateRigWeight();
         UpdateLeftHandIKWeight();
+    }
+
+    public void PlayFireAnimation()
+    {
+        _animator.SetTrigger("Fire");
     }
 
     private void UpdateLeftHandIKWeight()
@@ -79,30 +82,17 @@ public class PlayerWeaponVisuals : MonoBehaviour
         _leftHandIK.weight = 0;
         ReduceRigWeight();
         _animator.SetTrigger("EquipWeapon");
-        _animator.SetFloat("EquipSpeed", equipmentSpeed);
         _animator.SetFloat("EquipWeaponType", (float)equipType);
-
-        SetBusyEquipingWeaponTo(true);
+        _animator.SetFloat("EquipSpeed", equipmentSpeed);
     }
 
     public void PlayReloadAnimation()
     {
-        if (_isEquipingWeapon)
-        {
-            return;
-        }
-
         float reloadSpeed = _player.WeaponController.CurrentWeapon().reloadSpeed;
 
         _animator.SetFloat("ReloadSpeed", reloadSpeed);
         _animator.SetTrigger("Reload");
         ReduceRigWeight();
-    }
-
-    public void SetBusyEquipingWeaponTo(bool busy)
-    {
-        _isEquipingWeapon = busy;
-        _animator.SetBool("BusyEquipingWeapon", _isEquipingWeapon);
     }
 
     public void SwitchOnCurrentWeaponModel()

@@ -2615,6 +2615,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4332263203153830324, guid: c8039ab8ba8ee1e47a1772be14f21546, type: 3}
   m_PrefabInstance: {fileID: 482534118}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &931591269
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 931591270}
+  - component: {fileID: 931591271}
+  m_Layer: 0
+  m_Name: ObjectPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &931591270
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931591269}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &931591271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931591269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c140344be448e49a060909aa942a67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bulletPrefab: {fileID: 1537251178356839353, guid: eb13e9e904d39ac48bf2fbbb19866aa3, type: 3}
+  _poolSize: 50
 --- !u!1 &961655230
 GameObject:
   m_ObjectHideFlags: 0
@@ -3833,32 +3879,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _player: {fileID: 1211685604}
-  _animator: {fileID: 8982424698708777656}
   _currentWeapon:
     weaponType: 0
-    bulletsInMagazine: 0
-    magazineCapacity: 0
+    _shootType: 0
+    _fireRate: 1
+    bulletsInMagazine: 10
+    magazineCapacity: 10
     totalReserveAmmo: 10
     reloadSpeed: 1
     equipmentSpeed: 1
+    _baseSpread: 0
+    _currentSpread: 2
+    _maximumSpread: 3
+    _spreadIncreaseRate: 0.15
   _bulletPrefab: {fileID: 1537251178356839353, guid: eb13e9e904d39ac48bf2fbbb19866aa3, type: 3}
   _bulletSpeed: 20
-  _weaponPoint: {fileID: 724546038}
   _weaponHolder: {fileID: 76630000}
   _maxSlots: 2
   _weaponSlots:
   - weaponType: 0
-    bulletsInMagazine: 0
+    _shootType: 0
+    _fireRate: 1
+    bulletsInMagazine: 15
     magazineCapacity: 15
     totalReserveAmmo: 33
-    reloadSpeed: 0
+    reloadSpeed: 1
     equipmentSpeed: 1
-  - weaponType: 4
-    bulletsInMagazine: 6
-    magazineCapacity: 12
-    totalReserveAmmo: 12
-    reloadSpeed: 0
+    _baseSpread: 0
+    _currentSpread: 2
+    _maximumSpread: 3
+    _spreadIncreaseRate: 0.15
+  - weaponType: 2
+    _shootType: 1
+    _fireRate: 10
+    bulletsInMagazine: 100
+    magazineCapacity: 50
+    totalReserveAmmo: 6161
+    reloadSpeed: 1
     equipmentSpeed: 1
+    _baseSpread: 0.5
+    _currentSpread: 0.5
+    _maximumSpread: 3
+    _spreadIncreaseRate: 0.15
 --- !u!114 &1211685604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9972,3 +10034,4 @@ SceneRoots:
   - {fileID: 962030837}
   - {fileID: 1807539611}
   - {fileID: 4651278886647827557}
+  - {fileID: 931591270}
