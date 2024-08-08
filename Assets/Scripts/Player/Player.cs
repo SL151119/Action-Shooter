@@ -5,6 +5,7 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerAim _aim;
     [SerializeField] private PlayerMovement _movement;
     [SerializeField] private PlayerWeaponController _weaponController;
+    [SerializeField] private PlayerWeaponVisuals _weaponVisuals;
 
     private PlayerControls _controls;
 
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
     public PlayerControls Controls => _controls;
     public PlayerMovement Movement => _movement;
     public PlayerWeaponController WeaponController => _weaponController;
+    public PlayerWeaponVisuals WeaponVisuals => _weaponVisuals;
 
     private void Awake()
     {

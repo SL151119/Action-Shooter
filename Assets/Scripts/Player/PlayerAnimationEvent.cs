@@ -3,10 +3,12 @@ using UnityEngine;
 public class PlayerAnimationEvent : MonoBehaviour
 {
     [SerializeField] private PlayerWeaponVisuals _visualController;
+    [SerializeField] private PlayerWeaponController _weaponController;
 
     public void ReloadIsOver()
     {
         _visualController.MaximizeRigWeight();
+        _weaponController.CurrentWeapon().RefillBullets();
     }
 
     public void ReturnRig()
@@ -15,8 +17,10 @@ public class PlayerAnimationEvent : MonoBehaviour
         _visualController.MaximizeLeftHandWeight();
     }
 
-    public void WeaponGrabIsOver()
+    public void WeaponEquipingIsOver()
     {
-        _visualController.SetBusyGrabbingWeaponTo(false);
+        _visualController.SetBusyEquipingWeaponTo(false);
     }
+
+    public void SwitchOnWeaponModel() => _visualController.SwitchOnCurrentWeaponModel();
 }
