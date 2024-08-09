@@ -1,4 +1,7 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
@@ -43,11 +46,18 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void EquipWeapon(int weaponIndex)
     {
+        if (weaponIndex >= _weaponSlots.Count)
+        {
+            return;
+        }
+
         SetWeaponReady(false);
 
         _currentWeapon = _weaponSlots[weaponIndex];
 
         _player.WeaponVisuals.PlayWeaponEquipAnimation();
+
+        CameraManager.instance.ChangeCameraDistance(_currentWeapon.cameraDistance);
     }
 
     public void PickupWeapon(Weapon newWeapon)
@@ -77,6 +87,23 @@ public class PlayerWeaponController : MonoBehaviour
     public void SetWeaponReady(bool ready) => _isWeaponReady = ready;
     public bool WeaponReady() => _isWeaponReady;
 
+    private async UniTask BurstFire()
+    {
+        SetWeaponReady(false);
+
+        for (int i = 1; i <= _currentWeapon.bulletsPerShot; i++)
+        {
+            FireSingleBullet();
+
+            await UniTask.Delay(TimeSpan.FromSeconds(_currentWeapon.burstFireDelay)); // Use UniTask's delay for async waiting
+
+            if (i >= _currentWeapon.bulletsPerShot)
+            {
+                SetWeaponReady(true);
+            }
+        }
+    }
+
     private void Shoot()
     {
         if (WeaponReady() == false)
@@ -89,10 +116,25 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        _player.WeaponVisuals.PlayFireAnimation();
+
         if (_currentWeapon._shootType == ShootType.Single)
         {
             _isShooting = false;
         }
+
+        if (_currentWeapon.BurstActivated() == true)
+        {
+            BurstFire().Forget();
+            return;
+        }
+
+        FireSingleBullet();
+    }
+
+    private void FireSingleBullet()
+    {
+        _currentWeapon.bulletsInMagazine--;
 
         GameObject newBullet = ObjectPool.instance.GetBulletFromPool();
 
@@ -101,12 +143,13 @@ public class PlayerWeaponController : MonoBehaviour
 
         Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
 
+        Bullet bulletScript = newBullet.GetComponent<Bullet>();
+        bulletScript.BulletSetup(_currentWeapon.weaponDistance);
+
         Vector3 bulletsDirection = _currentWeapon.ApplySpread(BulletDirection());
 
         rbNewBullet.mass = REFERENCE_BULLET_SPEED / _bulletSpeed;
         rbNewBullet.velocity = bulletsDirection * _bulletSpeed;
-
-        _player.WeaponVisuals.PlayFireAnimation();
     }
 
     private void Reload()
@@ -130,14 +173,11 @@ public class PlayerWeaponController : MonoBehaviour
     }
 
     public bool HasOnlyOneWeapon() => _weaponSlots.Count <= 1;
-
-    public Transform WeaponPoint() => _player.WeaponVisuals.CurrentWeaponModel()._weaponPoint;
-    public Weapon CurrentWeapon() => _currentWeapon;
-    public Weapon BackupWeapon()
+    public Weapon WeaponInSlots(WeaponType weaponType)
     {
-        foreach(Weapon weapon in _weaponSlots)
+        foreach (Weapon weapon in _weaponSlots)
         {
-            if(weapon != _currentWeapon)
+            if (weapon.weaponType == weaponType)
             {
                 return weapon;
             }
@@ -145,6 +185,9 @@ public class PlayerWeaponController : MonoBehaviour
 
         return null;
     }
+
+    public Transform WeaponPoint() => _player.WeaponVisuals.CurrentWeaponModel()._weaponPoint;
+    public Weapon CurrentWeapon() => _currentWeapon;
 
     private void AssingInputEvents()
     {
@@ -155,6 +198,9 @@ public class PlayerWeaponController : MonoBehaviour
 
         controls.Character.EquipSlot1.performed += context => EquipWeapon(0);
         controls.Character.EquipSlot2.performed += context => EquipWeapon(1);
+        controls.Character.EquipSlot3.performed += context => EquipWeapon(2);
+        controls.Character.EquipSlot4.performed += context => EquipWeapon(3);
+        controls.Character.EquipSlot5.performed += context => EquipWeapon(4);
 
         controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
 
@@ -165,5 +211,7 @@ public class PlayerWeaponController : MonoBehaviour
                 Reload();
             }
         };
+
+        controls.Character.ToogleWeaponMode.performed += context => _currentWeapon.ToogleBurst();
     }
 }

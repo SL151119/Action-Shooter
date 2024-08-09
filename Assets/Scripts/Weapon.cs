@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public enum WeaponType
@@ -23,11 +23,20 @@ public class Weapon
 
     [Header("Shooting Specifics")]
     public ShootType _shootType;
+    public int bulletsPerShot;
+    public float defaultFireRate;
     [SerializeField] private float _fireRate = 1; //bullets per second
     private float _lastShootTime;
 
+    [Header("Burst Fire")]
+    public bool burstAvalible;
+    public bool burstActive;
+    public int burstBulletsPerShot;
+    public float burstFireRate;
+    public float burstFireDelay = 0.1f;
+
     [Header("Magazine Details")]
-    [SerializeField] private int bulletsInMagazine;
+    public int bulletsInMagazine;
     [SerializeField] private int magazineCapacity;
     [SerializeField] private int totalReserveAmmo;
 
@@ -35,6 +44,10 @@ public class Weapon
     public float reloadSpeed = 1; //how fast character reloads weapon
     [Range(1, 3)]
     public float equipmentSpeed = 1; //how fast character equips weapon
+    [Range(2, 12)]
+    public float weaponDistance = 4;
+    [Range(3, 8)]
+    public float cameraDistance = 6;
 
     [Header("Spread")]
     [SerializeField] private float _baseSpread = 1;
@@ -45,6 +58,38 @@ public class Weapon
 
     private float _lastSpreadUpdateTime;
     private float _spreadCooldown = 1;
+
+    public bool BurstActivated()
+    {
+        if (weaponType == WeaponType.Shotgun)
+        {
+            burstFireDelay = 0;
+            return true;
+        }
+
+        return burstActive;
+    }
+
+    public void ToogleBurst()
+    {
+        if (burstAvalible == false)
+        {
+            return;
+        }
+
+        burstActive = !burstActive;
+
+        if (burstActive)
+        {
+            bulletsPerShot = burstBulletsPerShot;
+            _fireRate = burstFireRate;
+        }
+        else
+        {
+            bulletsPerShot = 1;
+            _fireRate = defaultFireRate;
+        }
+    }
 
     public Vector3 ApplySpread(Vector3 originalDirection)
     {
@@ -76,16 +121,7 @@ public class Weapon
         _currentSpread = Mathf.Clamp(_currentSpread + _spreadIncreaseRate, _baseSpread, _maximumSpread);
     }
 
-    public bool CanShoot()
-    {
-        if (HaveEnoughBullets() && ReadyToShoot())
-        {
-            bulletsInMagazine--;
-            return true;
-        }
-
-        return false;
-    }
+    public bool CanShoot() => HaveEnoughBullets() && ReadyToShoot();
 
     private bool ReadyToShoot()
     {
