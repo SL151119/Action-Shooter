@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using UnityEngine;
 
 public enum WeaponType
@@ -20,50 +19,77 @@ public enum ShootType
 public class Weapon
 {
     public WeaponType weaponType;
+    public ShootType shootType;
+    public int BulletsPerShot { get; private set; }
 
-    [Header("Shooting Specifics")]
-    public ShootType _shootType;
-    public int bulletsPerShot;
-    public float defaultFireRate;
-    [SerializeField] private float _fireRate = 1; //bullets per second
+    private float _defaultFireRate;
+    public float fireRate = 1; //bullets per second
     private float _lastShootTime;
 
-    [Header("Burst Fire")]
-    public bool burstAvalible;
+    private bool _burstAvailable;
     public bool burstActive;
-    public int burstBulletsPerShot;
-    public float burstFireRate;
-    public float burstFireDelay = 0.1f;
+
+    private int _burstBulletsPerShot;
+    private float _burstFireRate;
+    public float BurstFireDelay { get; private set; }
 
     [Header("Magazine Details")]
     public int bulletsInMagazine;
-    [SerializeField] private int magazineCapacity;
-    [SerializeField] private int totalReserveAmmo;
+    public int magazineCapacity;
+    public int totalReserveAmmo;
 
-    [Range(1, 3)]
-    public float reloadSpeed = 1; //how fast character reloads weapon
-    [Range(1, 3)]
-    public float equipmentSpeed = 1; //how fast character equips weapon
-    [Range(2, 12)]
-    public float weaponDistance = 4;
-    [Range(3, 8)]
-    public float cameraDistance = 6;
+    public float ReloadSpeed { get; private set; } //how fast character reloads weapon
+    public float EquipmentSpeed { get; private set; } //how fast character equips weapon
+
+    public float WeaponDistance { get; private set; }
+    public float CameraDistance { get; private set; }
 
     [Header("Spread")]
-    [SerializeField] private float _baseSpread = 1;
-    [SerializeField] private float _maximumSpread = 3;
+    private float _baseSpread = 1;
+    private float _maximumSpread = 3;
     private float _currentSpread = 2;
 
-    [SerializeField] private float _spreadIncreaseRate = 0.15f;
+    private float _spreadIncreaseRate = 0.15f;
 
     private float _lastSpreadUpdateTime;
     private float _spreadCooldown = 1;
+
+    public Weapon(Weapon_Data weaponData)
+    {
+        bulletsInMagazine = weaponData.bulletsInMagazine;
+        magazineCapacity = weaponData.magazineCapacity;
+        totalReserveAmmo = weaponData.totalReserveAmmo;
+
+        fireRate = weaponData.fireRate;
+        weaponType = weaponData.weaponType;
+
+        BulletsPerShot = weaponData.bulletsPerShot;
+        shootType = weaponData.shootType;
+
+        _burstAvailable = weaponData.burstAvailable;
+        burstActive = weaponData.burstActive;
+        _burstBulletsPerShot = weaponData.burstBulletsPerShot;
+        _burstFireRate = weaponData.burstFireRate;
+        BurstFireDelay = weaponData.burstFireDelay;
+
+        _baseSpread = weaponData.baseSpread;
+        _maximumSpread = weaponData.maximumSpread;
+
+        _spreadIncreaseRate = weaponData.spreadIncreaseRate;
+
+        ReloadSpeed = weaponData.reloadSpeed;
+        EquipmentSpeed = weaponData.equipmentSpeed;
+        WeaponDistance = weaponData.weaponDistance;
+        CameraDistance = weaponData.cameraDistance;
+
+        _defaultFireRate = fireRate;
+    }
 
     public bool BurstActivated()
     {
         if (weaponType == WeaponType.Shotgun)
         {
-            burstFireDelay = 0;
+            BurstFireDelay = 0;
             return true;
         }
 
@@ -72,7 +98,7 @@ public class Weapon
 
     public void ToogleBurst()
     {
-        if (burstAvalible == false)
+        if (_burstAvailable == false)
         {
             return;
         }
@@ -81,13 +107,13 @@ public class Weapon
 
         if (burstActive)
         {
-            bulletsPerShot = burstBulletsPerShot;
-            _fireRate = burstFireRate;
+            BulletsPerShot = _burstBulletsPerShot;
+            fireRate = _burstFireRate;
         }
         else
         {
-            bulletsPerShot = 1;
-            _fireRate = defaultFireRate;
+            BulletsPerShot = 1;
+            fireRate = _defaultFireRate;
         }
     }
 
@@ -125,7 +151,7 @@ public class Weapon
 
     private bool ReadyToShoot()
     {
-        if (Time.time > _lastShootTime + 1 / _fireRate)
+        if (Time.time > _lastShootTime + 1 / fireRate)
         {
             _lastShootTime = Time.time;
             return true;
@@ -136,7 +162,7 @@ public class Weapon
 
     private bool HaveEnoughBullets()
     {
-        return bulletsInMagazine > 0;
+        return bulletsInMagazine > 0 && bulletsInMagazine >= BulletsPerShot; // 2nd condition to prevent negative bullets count
     }
 
     public bool CanReload()

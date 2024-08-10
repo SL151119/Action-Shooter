@@ -77,7 +77,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
     {
         EquipWeaponType equipType = CurrentWeaponModel()._equipType;
 
-        float equipmentSpeed = _player.WeaponController.CurrentWeapon().equipmentSpeed;
+        float equipmentSpeed = _player.WeaponController.CurrentWeapon().EquipmentSpeed;
 
         _leftHandIK.weight = 0;
         ReduceRigWeight();
@@ -88,7 +88,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
 
     public void PlayReloadAnimation()
     {
-        float reloadSpeed = _player.WeaponController.CurrentWeapon().reloadSpeed;
+        float reloadSpeed = _player.WeaponController.CurrentWeapon().ReloadSpeed;
 
         _animator.SetFloat("ReloadSpeed", reloadSpeed);
         _animator.SetTrigger("Reload");

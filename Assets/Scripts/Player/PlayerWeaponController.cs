@@ -10,6 +10,8 @@ public class PlayerWeaponController : MonoBehaviour
 
     [SerializeField] private Player _player;
 
+    [SerializeField] private Weapon_Data _defaultWeaponData;
+
     [SerializeField] private Weapon _currentWeapon;
     private bool _isWeaponReady;
     private bool _isShooting;
@@ -41,6 +43,8 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void EquipStartingWeapon()
     {
+        _weaponSlots[0] = new Weapon(_defaultWeaponData);
+
         EquipWeapon(0);
     }
 
@@ -57,16 +61,18 @@ public class PlayerWeaponController : MonoBehaviour
 
         _player.WeaponVisuals.PlayWeaponEquipAnimation();
 
-        CameraManager.instance.ChangeCameraDistance(_currentWeapon.cameraDistance);
+        CameraManager.instance.ChangeCameraDistance(_currentWeapon.CameraDistance);
     }
 
-    public void PickupWeapon(Weapon newWeapon)
+    public void PickupWeapon(Weapon_Data newWeaponData)
     {
         if (_weaponSlots.Count >= _maxSlots)
         {
             Debug.Log("No Slots");
             return;
         }
+
+        Weapon newWeapon = new Weapon(newWeaponData);
 
         _weaponSlots.Add(newWeapon);
         _player.WeaponVisuals.SwitchOnBackupWeaponModel();
@@ -91,13 +97,13 @@ public class PlayerWeaponController : MonoBehaviour
     {
         SetWeaponReady(false);
 
-        for (int i = 1; i <= _currentWeapon.bulletsPerShot; i++)
+        for (int i = 1; i <= _currentWeapon.BulletsPerShot; i++)
         {
             FireSingleBullet();
 
-            await UniTask.Delay(TimeSpan.FromSeconds(_currentWeapon.burstFireDelay)); // Use UniTask's delay for async waiting
+            await UniTask.Delay(TimeSpan.FromSeconds(_currentWeapon.BurstFireDelay)); // Use UniTask's delay for async waiting
 
-            if (i >= _currentWeapon.bulletsPerShot)
+            if (i >= _currentWeapon.BulletsPerShot)
             {
                 SetWeaponReady(true);
             }
@@ -111,6 +117,20 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        if (_currentWeapon.bulletsInMagazine < _currentWeapon.BulletsPerShot) // reloading when we try to shoot and we don't have enough bullets to shoot
+        {
+            if (_currentWeapon.CanReload())
+            {
+                Reload();
+                return;
+            }
+            else
+            {
+                Debug.LogWarning("Cannot reload. No ammo in reserve.");
+                return;
+            }
+        }
+
         if (_currentWeapon.CanShoot() == false)
         {
             return;
@@ -118,7 +138,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         _player.WeaponVisuals.PlayFireAnimation();
 
-        if (_currentWeapon._shootType == ShootType.Single)
+        if (_currentWeapon.shootType == ShootType.Single)
         {
             _isShooting = false;
         }
@@ -136,7 +156,7 @@ public class PlayerWeaponController : MonoBehaviour
     {
         _currentWeapon.bulletsInMagazine--;
 
-        GameObject newBullet = ObjectPool.instance.GetBulletFromPool();
+        GameObject newBullet = ObjectPool.instance.GetObject(_bulletPrefab);
 
         newBullet.transform.position = WeaponPoint().position;
         newBullet.transform.rotation = Quaternion.LookRotation(WeaponPoint().forward);
@@ -144,7 +164,7 @@ public class PlayerWeaponController : MonoBehaviour
         Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
 
         Bullet bulletScript = newBullet.GetComponent<Bullet>();
-        bulletScript.BulletSetup(_currentWeapon.weaponDistance);
+        bulletScript.BulletSetup(_currentWeapon.WeaponDistance);
 
         Vector3 bulletsDirection = _currentWeapon.ApplySpread(BulletDirection());
 
