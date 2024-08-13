@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerMovement _movement;
     [SerializeField] private PlayerWeaponController _weaponController;
     [SerializeField] private PlayerWeaponVisuals _weaponVisuals;
+    [SerializeField] private PlayerInteraction _playerInteraction;
 
     private PlayerControls _controls;
 

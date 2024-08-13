@@ -54,6 +54,8 @@ public class Weapon
     private float _lastSpreadUpdateTime;
     private float _spreadCooldown = 1;
 
+    public Weapon_Data WeaponData { get; private set; } // serves as default weapon data
+
     public Weapon(Weapon_Data weaponData)
     {
         bulletsInMagazine = weaponData.bulletsInMagazine;
@@ -83,6 +85,8 @@ public class Weapon
         CameraDistance = weaponData.cameraDistance;
 
         _defaultFireRate = fireRate;
+
+        this.WeaponData = weaponData;
     }
 
     public bool BurstActivated()
